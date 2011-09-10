@@ -42,17 +42,18 @@ sub new {
         namespace => qr/./,
         output    => undef,
         verbose   => undef,
+        format    => undef,
     } => $class;
     GetOptions(
         "ignore=s"    => \$self->{ignore},
         "namespace=s" => \$self->{namespace},
         "verbose"     => \$self->{verbose},
-        "png"         => sub { $self->{output} = '_as_png' },
-        "gif"         => sub { $self->{output} = '_as_gif' },
-        "svg"         => sub { $self->{output} = '_as_svg' },
+        "png"         => sub { $self->{output} = 'png' },
+        "gif"         => sub { $self->{output} = 'gif' },
+        "output=s"    => \$self->{output},
         "I=s@"        => \$self->{lib},
     );
-    $self->{output} ||= '_as_txt';
+    $self->{output} ||= 'txt';
 
     unless ( @ARGV ) {
         die "You must supply at least one directory to load for Class::Sniff::App";
@@ -91,29 +92,18 @@ sub run {
     );
     $self->{graph} = $graph;
     my $output = $self->_output;
-    print $self->$output;
+
+    print $output eq 'txt'
+      ? ( $self->_as_txt )
+      : ( $self->_as_dot($output) );
 }
 
 sub _as_txt { shift->_graph->as_ascii }
 
-sub _as_png {
-    my $self     = shift;
+sub _as_dot {
+    my ($self, $format) = @_;
     my $graphviz = $self->_graph->as_graphviz();
-    open my $DOT, '|dot -Tpng' or die("Cannot open pipe to dot: $!");
-    print $DOT $graphviz;
-}
-
-sub _as_gif {
-    my $self     = shift;
-    my $graphviz = $self->_graph->as_graphviz();
-    open my $DOT, '|dot -Tgif' or die("Cannot open pipe to dot: $!");
-    print $DOT $graphviz;
-}
-
-sub _as_svg {
-    my $self     = shift;
-    my $graphviz = $self->_graph->as_graphviz();
-    open my $DOT, '|dot -Tsvg' or die("Cannot open pipe to dot: $!");
+    open my $DOT, "|dot -T$format" or die("Cannot open pipe to dot: $!");
     print $DOT $graphviz;
 }
 
