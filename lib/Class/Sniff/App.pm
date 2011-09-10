@@ -49,6 +49,7 @@ sub new {
         "verbose"     => \$self->{verbose},
         "png"         => sub { $self->{output} = '_as_png' },
         "gif"         => sub { $self->{output} = '_as_gif' },
+        "svg"         => sub { $self->{output} = '_as_svg' },
         "I=s@"        => \$self->{lib},
     );
     $self->{output} ||= '_as_txt';
@@ -106,6 +107,13 @@ sub _as_gif {
     my $self     = shift;
     my $graphviz = $self->_graph->as_graphviz();
     open my $DOT, '|dot -Tgif' or die("Cannot open pipe to dot: $!");
+    print $DOT $graphviz;
+}
+
+sub _as_svg {
+    my $self     = shift;
+    my $graphviz = $self->_graph->as_graphviz();
+    open my $DOT, '|dot -Tsvg' or die("Cannot open pipe to dot: $!");
     print $DOT $graphviz;
 }
 
