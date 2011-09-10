@@ -1111,7 +1111,7 @@ sub _get_parents {
     return if $class eq 'UNIVERSAL' or !$self->_is_real_package($class);
     no strict 'refs';
 
-    my @parents = List::MoreUtils::uniq( @{"$class\::ISA"} );
+    my @parents = grep { $_ !~ /^::/ } List::MoreUtils::uniq( @{"$class\::ISA"} );
     if ( $self->universal && not @parents ) {
         @parents = 'UNIVERSAL';
     }
