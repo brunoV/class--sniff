@@ -37,7 +37,7 @@ sub new {
     my ( $class, @args ) = @_;
     local @ARGV = @args;
     my $self = bless {
-        dir       => undef,
+        dirs      => undef,
         ignore    => undef,
         namespace => qr/./,
         output    => undef,
@@ -64,7 +64,7 @@ sub new {
     return $self;
 }
 
-sub _dirs       { @{$_[0]->{dirs}} }
+sub _dirs      { @{$_[0]->{dirs}} }
 sub _ignore    { $_[0]->{ignore} }
 sub _graph     { $_[0]->{graph} }
 sub _namespace { $_[0]->{namespace} }
